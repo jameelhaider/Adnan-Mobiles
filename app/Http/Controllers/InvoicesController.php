@@ -46,9 +46,13 @@ class InvoicesController extends Controller
             if (Auth::user()->email == 'husnainbutt047@gmail.com') {
                 abort(401);
             }
-            $stocks = DB::table('stocks')
-            ->orderBy('created_at','desc')
-            ->get();
+            $query = Stocks::query();
+            if ($request->name) {
+                $query->where('name', 'LIKE', '%' . $request->name . '%');
+            }
+            $stocks = $query
+                ->orderBy('created_at', 'desc')
+                ->get();
             return view('invoices.make', compact('stocks'));
         } else {
             return abort(401);

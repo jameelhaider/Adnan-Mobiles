@@ -52,6 +52,24 @@
 
 
 
+ <div class="card mb-2 p-2 mt-2">
+            <form action="" method="GET">
+                <div class="row">
+                     <div class="col-lg-9 col-md-8 col-sm-6 col-7 mt-1 mb-1">
+                        <input type="text" placeholder="Name" class="form-control" value="{{ request()->name }}" name="name">
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-sm-6 col-5 mt-1 mb-1">
+                        <div class="btn-group w-100">
+                            <a href="{{ url('admin/invoices/make') }}" title="Clear"
+                                class="btn btn-outline-danger">Clear</a>
+                            <button type="submit" title="Search" class="btn btn-outline-success">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+
 
 
 
