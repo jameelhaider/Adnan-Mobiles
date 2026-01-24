@@ -10,6 +10,36 @@ use Illuminate\Support\Facades\Gate;
 
 class StocksController extends Controller
 {
+
+    public function copyAvailableStocks()
+    {
+        $stocks = Stocks::where('qty', '>', 0)
+            ->orderBy('id', 'desc') // DESC order (latest first)
+            ->get();
+
+        if ($stocks->isEmpty()) {
+            return response()->json([
+                'text' => 'No stock available'
+            ]);
+        }
+
+        $text = '';
+
+        foreach ($stocks as $stock) {
+            $text .= $stock->name
+                . "        Rs. "
+                . $stock->sale_price
+                . "\n\n";
+        }
+
+        return response()->json([
+            'text' => trim($text)
+        ]);
+    }
+
+
+
+
     public function index(Request $request)
     {
         if (!Gate::allows('is_admin')) {

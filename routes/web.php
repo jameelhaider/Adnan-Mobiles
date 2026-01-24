@@ -4,12 +4,10 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InvoicesController;
 use App\Http\Controllers\StocksController;
 use App\Mail\DatabaseBackupMail;
-use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +29,7 @@ use Illuminate\Support\Facades\Route;
 
 
 
+Route::get('/copy-available-stocks', [StocksController::class, 'copyAvailableStocks']);
 
 
 
@@ -59,7 +58,7 @@ Route::get('/send-database-backup', function () {
         }
         $sql .= "\n\n";
     }
-    Mail::to(['jameelhaider047@gmail.com', 'husnainbutt047@gmail.com', 'loyalfreebird@gmail.com'])
+    Mail::to(['jameelhaider047@gmail.com', 'husnainbutt047@gmail.com', 'loyelfreebird@gmail.com'])
         ->send(new DatabaseBackupMail($sql, $filename));
     return redirect()->back()->with('success', 'Database backup sent to email successfully.');
 })->name('send.database.backup');

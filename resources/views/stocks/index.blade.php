@@ -23,8 +23,8 @@
 
 
                 </div>
-                <div class="col-lg-9 col-6 col-md-8 col-sm-7">
 
+                {{-- <div class="col-lg-9 col-6 col-md-8 col-sm-7">
                     <div class="d-flex align-items-center">
                         <h3 class="mt-1 d-none d-md-block d-lg-block" style="font-family: cursive;">Stock Items</h3>
 
@@ -32,19 +32,41 @@
                         </h5>
 
 
-
-
-
-
-
-
-
-
-
                     </div>
+                </div> --}}
 
+                <div class="col-lg-9 col-6 col-md-8 col-sm-7">
+                    <div class="d-flex align-items-center gap-2">
+                        <h3 class="mt-1 d-none d-md-block d-lg-block" style="font-family: cursive;">Stock Items</h3>
 
+                        <h5 class="mt-1 d-block d-lg-none d-md-none d-sm-block" style="font-family: cursive;">
+                            Stock Items
+                        </h5>
+
+                        <button type="button" class="btn btn-sm btn-primary" id="copyAvailableParts">
+                            Copy Available Parts
+                        </button>
+                    </div>
                 </div>
+                
+<script>
+document.getElementById('copyAvailableParts').addEventListener('click', function () {
+    fetch("{{ url('/copy-available-stocks') }}")
+        .then(response => response.json())
+        .then(data => {
+            navigator.clipboard.writeText(data.text).then(() => {
+                alert('Available stock copied successfully!');
+            });
+        })
+        .catch(err => {
+            alert('Something went wrong!');
+        });
+});
+</script>
+
+
+
+
             </div>
         </div>
 
@@ -74,16 +96,13 @@
 
 
 
-<div class="card mb-2 p-2 mt-2">
-    <div class="row">
-        <div class="col-12">
-            <input type="text"
-                   id="live-search"
-                   class="form-control"
-                   placeholder="Search by name...">
+        <div class="card mb-2 p-2 mt-2">
+            <div class="row">
+                <div class="col-12">
+                    <input type="text" id="live-search" class="form-control" placeholder="Search by name...">
+                </div>
+            </div>
         </div>
-    </div>
-</div>
 
 
         @if ($stocks->count() > 0 && request()->name)
@@ -101,11 +120,11 @@
 
 
 
-      <div class="card p-2 mb-0">
-    <div id="table-data">
-        @include('stocks.partials.table')
-    </div>
-</div>
+        <div class="card p-2 mb-0">
+            <div id="table-data">
+                @include('stocks.partials.table')
+            </div>
+        </div>
 
 
     </div>
@@ -114,22 +133,24 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<script>
-$(document).ready(function () {
-    $('#live-search').on('keyup', function () {
-        let value = $(this).val();
+    <script>
+        $(document).ready(function() {
+            $('#live-search').on('keyup', function() {
+                let value = $(this).val();
 
-        $.ajax({
-            url: "{{ route('stock.index') }}",
-            type: "GET",
-            data: { name: value },
-            success: function (data) {
-                $('#table-data').html(data);
-            }
+                $.ajax({
+                    url: "{{ route('stock.index') }}",
+                    type: "GET",
+                    data: {
+                        name: value
+                    },
+                    success: function(data) {
+                        $('#table-data').html(data);
+                    }
+                });
+            });
         });
-    });
-});
-</script>
+    </script>
 
 
 @endsection
