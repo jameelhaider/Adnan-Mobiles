@@ -48,21 +48,21 @@
                         </button>
                     </div>
                 </div>
-                
-<script>
-document.getElementById('copyAvailableParts').addEventListener('click', function () {
-    fetch("{{ url('/copy-available-stocks') }}")
-        .then(response => response.json())
-        .then(data => {
-            navigator.clipboard.writeText(data.text).then(() => {
-                alert('Available stock copied successfully!');
-            });
-        })
-        .catch(err => {
-            alert('Something went wrong!');
-        });
-});
-</script>
+
+                <script>
+                    document.getElementById('copyAvailableParts').addEventListener('click', function() {
+                        fetch("{{ url('/copy-available-stocks') }}")
+                            .then(response => response.json())
+                            .then(data => {
+                                navigator.clipboard.writeText(data.text).then(() => {
+                                    alert('Available stock copied successfully!');
+                                });
+                            })
+                            .catch(err => {
+                                alert('Something went wrong!');
+                            });
+                    });
+                </script>
 
 
 

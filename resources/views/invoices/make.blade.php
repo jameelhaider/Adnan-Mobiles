@@ -98,7 +98,7 @@
                             <tbody>
                                 @foreach ($stocks as $key => $stock)
                                     <tr data-price="{{ $stock->sale_price }}">
-                                        <td class="text-center">
+                                        <td class="text-center" style="width: 5%">
                                             <!-- checkbox with unique id -->
                                             <input type="checkbox" class="item-check big-checkbox"
                                                 id="item_{{ $stock->id }}" {{ $stock->qty <= 0 ? 'disabled' : '' }}>
@@ -117,7 +117,7 @@
                                             }
                                         </style>
 
-                                        <td class="text-dark fw-bold" style="font-size: 16px;">
+                                        <td class="text-dark fw-bold" style="font-size: 16px;width:40%">
                                             <!-- Wrap name in label linked to checkbox -->
                                             <label for="item_{{ $stock->id }}" style="cursor:pointer;">
                                                 @if ($stock->qty > 0)
@@ -133,18 +133,18 @@
                                         </td>
 
 
-                                        <td class="text-dark fw-bold">
+                                        <td class="text-dark fw-bold" style="width:10%">
                                             {{ 'Rs.' . number_format($stock->sale_price) }}
                                         </td>
 
-                                        <td class="text-center text-dark">{{ $stock->qty }}</td>
+                                        <td class="text-center text-dark" style="width:10%">{{ $stock->qty }}</td>
 
-                                        <td class="text-center">
+                                        <td class="text-center" style="width: 10%">
                                             <input type="number" class="form-control qty-input" min="1"
                                                 max="{{ $stock->qty }}" value="1" disabled>
                                         </td>
 
-                                        <td class="text-center fw-bold row-total text-dark">Rs. 0</td>
+                                        <td class="text-center fw-bold row-total text-dark" style="width:10%">Rs. 0</td>
                                     </tr>
                                 @endforeach
                             </tbody>
