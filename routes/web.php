@@ -118,7 +118,6 @@ Route::middleware(['auth'])->group(function () {
                 $totalrass = DB::table('stocks')
                     ->select(DB::raw('SUM(qty * sale_price) as total'))
                     ->value('total');
-                //  $todaysale =1200;
                 $today = Carbon::today();
                 $startOfWeek = Carbon::now()->startOfWeek();
                 $startOfMonth = Carbon::now()->startOfMonth();
@@ -126,7 +125,6 @@ Route::middleware(['auth'])->group(function () {
                 $endOfWeek = Carbon::now()->endOfWeek();
                 $startOfYear = Carbon::now()->startOfYear();
                 $endOfYear = Carbon::now()->endOfYear();
-
                 $todaysale = DB::table('invoice_items')
                     ->whereDate('created_at', $today)
                     ->where('status', '!=', 'Returned')
@@ -139,7 +137,10 @@ Route::middleware(['auth'])->group(function () {
                     ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
                     ->where('status', '!=', 'Returned')
                     ->sum('total');
-                return view('admin', compact('totalrass', 'todaysale', 'thisweeksale', 'thismonthsale'));
+                     $overallsale = DB::table('invoice_items')
+                    ->where('status', '!=', 'Returned')
+                    ->sum('total');
+                return view('admin', compact('totalrass', 'todaysale', 'thisweeksale', 'thismonthsale','overallsale'));
             } else {
                 return abort(401);
             }

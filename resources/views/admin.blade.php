@@ -87,6 +87,20 @@
 
         <h2 class="fw-bold text-center text-dark">Sale Stats</h2>
         <div class="row justify-content-around">
+            <div class="col-lg-12 col-12 col-md-12 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="card-icon bx bx-money"></i>
+                        OverAll Sale
+                    </div>
+                    <div class="card-body text-center count-animation" data-count="{{ $overallsale }}">
+                        RS.0
+                    </div>
+                </div>
+            </div>
+
+
+
             <div class="col-lg-4 col-12 col-md-6 mb-4">
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
