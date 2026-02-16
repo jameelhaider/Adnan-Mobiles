@@ -114,7 +114,7 @@
                             @foreach ($return_items as $key => $item)
                                 <tr>
                                     <td class="text-dark text-center">{{ ++$key }}</td>
-                                    <td class="text-dark fw-bold" style="font-size: 17px">
+                                    <td class="text-dark fw-bold" style="font-size: 14px;width:45%">
                                      {{ $item->name }}
                                     </td>
                                     <td class="text-dark">
@@ -127,7 +127,7 @@
                                      {{'Rs.'. number_format($item->total) }}
                                     </td>
 
-                                    <td class="text-dark"> {{ \Carbon\Carbon::parse($item->created_at)->format('d M y | h:i A') }}</td>
+                                    <td class="text-dark fw-bold" style="font-size: 16px"> {{ \Carbon\Carbon::parse($item->created_at)->format('d M y | h:i A') }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

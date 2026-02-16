@@ -130,7 +130,7 @@
 
 
 
-                                    <td class="text-dark" title="{{ 'Rs.' . number_format($invoice->total_bill) }}">
+                                    <td class="text-dark fw-bold" style="font-size: 16px" title="{{ 'Rs.' . number_format($invoice->total_bill) }}">
 
 
                                         <a class="nav-link text-dark"
@@ -141,7 +141,7 @@
                                         <span class="badge bg-primary">{{ $invoice->total_items }}</span>
                                     </td>
 
-                                    <td class="text-dark"
+                                    <td class="text-dark fw-bold" style="font-size: 16px"
                                         title="{{ \Carbon\Carbon::parse($invoice->created_at)->format('d M y, h:i A') }}">
                                         {{ \Carbon\Carbon::parse($invoice->created_at)->format('d M y, h:i A') }}
                                     </td>

@@ -9,9 +9,6 @@
                         class="btn btn-primary custom-back-button d-flex align-items-center justify-content-center">
                         <i class="bx bx-home me-1"></i> Dashboard
                     </a>
-
-
-
                 </div>
                 <div class="col-lg-9 col-5 col-md-8 col-sm-7">
 
@@ -117,7 +114,7 @@
                             @foreach ($invoice_items as $key => $item)
                                 <tr>
                                     <td class="text-dark text-center">{{ ++$key }}</td>
-                                    <td class="text-dark fw-bold" style="font-size: 17px">
+                                    <td class="text-dark fw-bold" style="font-size: 14px;width:40%">
                                         {{ $item->name }}
                                         <br>
                                         @if ($item->status=='Partial Returned')
@@ -134,7 +131,7 @@
                                         {{ 'Rs.' . number_format($item->total) }}
                                     </td>
 
-                                    <td class="text-dark">
+                                    <td class="text-dark fw-bold" style="font-size: 16px">
                                         {{ \Carbon\Carbon::parse($item->created_at)->format('d M y | h:i A') }}</td>
 
 
