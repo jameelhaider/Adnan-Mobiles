@@ -183,63 +183,172 @@ class InvoicesController extends Controller
 
 
 
+    // public function save(Request $request)
+    // {
+    //     if (!Gate::allows('is_admin')) {
+    //         return abort(401);
+    //     }
+    //     $request->validate([
+    //         'stock_id' => 'required|array',
+    //         'stock_id.*' => 'exists:stocks,id',
+    //         'qty' => 'required|array',
+    //         'qty.*' => 'integer|min:1',
+    //         'sale_price' => 'required|array',
+    //         'sale_price.*' => 'numeric|min:0',
+    //     ]);
+    //     $stockIds = $request->stock_id;
+    //     $qtys = $request->qty;
+    //     $prices = $request->sale_price;
+    //     $totalBill = 0;
+    //     $totalItems = count($stockIds);
+    //     DB::beginTransaction();
+
+    //     try {
+    //         $invoice = Invoices::create([
+    //             'total_bill' => 0,
+    //             'total_items' => $totalItems,
+    //             'status' => 'Paid',
+    //         ]);
+
+    //         foreach ($stockIds as $index => $stockId) {
+    //             $qty = $qtys[$index];
+    //             $price = $prices[$index];
+    //             $total = $qty * $price;
+    //             $stock = Stocks::findOrFail($stockId);
+    //             $name = $stock->name;
+    //             InvoiceItems::create([
+    //                 'invoice_id' => $invoice->id,
+    //                 'stock_id' => $stockId,
+    //                 'name' => $name,
+    //                 'qty' => $qty,
+    //                 'price' => $price,
+    //                 'total' => $total,
+    //             ]);
+    //             if ($stock->qty >= $qty) {
+    //                 $stock->decrement('qty', $qty);
+    //             } else {
+    //                 throw new \Exception("Not enough stock for item: {$name}");
+    //             }
+
+    //             $totalBill += $total;
+    //         }
+    //         $invoice->update([
+    //             'total_bill' => $totalBill,
+    //         ]);
+    //         DB::commit();
+    //         return redirect()->route('invoice.view', ['id' => $invoice->id])->with('success', 'Invoice created successfully!');
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         return redirect()->back()->with('error', 'Something went wrong: ' . $e->getMessage());
+    //     }
+    // }
+
     public function save(Request $request)
     {
         if (!Gate::allows('is_admin')) {
-            return abort(401);
+            abort(401);
         }
+
         $request->validate([
             'stock_id' => 'required|array',
-            'stock_id.*' => 'exists:stocks,id',
+            'stock_id.*' => 'required|exists:stocks,id',
             'qty' => 'required|array',
-            'qty.*' => 'integer|min:1',
+            'qty.*' => 'required|integer|min:1',
             'sale_price' => 'required|array',
-            'sale_price.*' => 'numeric|min:0',
+            'sale_price.*' => 'required|numeric|min:0',
         ]);
+
         $stockIds = $request->stock_id;
         $qtys = $request->qty;
         $prices = $request->sale_price;
-        $totalBill = 0;
-        $totalItems = count($stockIds);
+
+        // ✅ Ensure all arrays match
+        if (count($stockIds) !== count($qtys) || count($stockIds) !== count($prices)) {
+            return back()->withErrors('Invalid input: mismatch between items, quantities, and prices.');
+        }
+
         DB::beginTransaction();
 
         try {
-            $invoice = Invoices::create([
-                'total_bill' => 0,
-                'total_items' => $totalItems,
-                'status' => 'Paid',
-            ]);
+            $totalBill = 0;
+            $itemsData = [];
 
+            // 🔒 Lock all stocks first (prevents race conditions)
+            $stocks = Stocks::whereIn('id', $stockIds)
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id');
+
+            // ❌ Check missing stocks
+            foreach ($stockIds as $stockId) {
+                if (!isset($stocks[$stockId])) {
+                    throw new \Exception("Stock not found for ID: {$stockId}");
+                }
+            }
+
+            // ✅ Validate all items BEFORE writing anything
             foreach ($stockIds as $index => $stockId) {
-                $qty = $qtys[$index];
-                $price = $prices[$index];
+                $qty = (int) $qtys[$index];
+                $price = (float) $prices[$index];
+
+                $stock = $stocks[$stockId];
+
+                if ($stock->qty < $qty) {
+                    throw new \Exception("Not enough stock for item: {$stock->name}");
+                }
+
                 $total = $qty * $price;
-                $stock = Stocks::findOrFail($stockId);
-                $name = $stock->name;
-                InvoiceItems::create([
-                    'invoice_id' => $invoice->id,
+
+                $itemsData[] = [
+                    'stock' => $stock,
                     'stock_id' => $stockId,
-                    'name' => $name,
+                    'name' => $stock->name,
                     'qty' => $qty,
                     'price' => $price,
                     'total' => $total,
-                ]);
-                if ($stock->qty >= $qty) {
-                    $stock->decrement('qty', $qty);
-                } else {
-                    throw new \Exception("Not enough stock for item: {$name}");
-                }
+                ];
 
                 $totalBill += $total;
             }
-            $invoice->update([
+
+            // ❌ Prevent empty invoice
+            if ($totalBill <= 0) {
+                throw new \Exception("Invoice total must be greater than zero.");
+            }
+
+            // ✅ Now create invoice AFTER validation
+            $invoice = Invoices::create([
                 'total_bill' => $totalBill,
+                'total_items' => count($itemsData),
+                'status' => 'Paid',
             ]);
+
+            // ✅ Insert items & update stock
+            foreach ($itemsData as $item) {
+                InvoiceItems::create([
+                    'invoice_id' => $invoice->id,
+                    'stock_id' => $item['stock_id'],
+                    'name' => $item['name'],
+                    'qty' => $item['qty'],
+                    'price' => $item['price'],
+                    'total' => $item['total'],
+                ]);
+
+                // Deduct stock safely
+                $item['stock']->decrement('qty', $item['qty']);
+            }
+
             DB::commit();
-            return redirect()->route('invoice.view', ['id' => $invoice->id])->with('success', 'Invoice created successfully!');
+
+            return redirect()
+                ->route('invoice.view', ['id' => $invoice->id])
+                ->with('success', 'Invoice created successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Something went wrong: ' . $e->getMessage());
+
+            return back()
+                ->withInput()
+                ->withErrors('Error: ' . $e->getMessage());
         }
     }
 }
