@@ -34,6 +34,20 @@ Route::get('/copy-available-stocks', [StocksController::class, 'copyAvailableSto
 
 
 
+Route::get('/today-sale', function () {
+    $today = Carbon::today();
+
+    $todaysale = DB::table('invoice_items')
+        ->whereDate('created_at', $today)
+        ->where('status', '!=', 'Returned')
+        ->sum('total');
+
+    return response()->json([
+        'status' => 'success',
+        'date' => $today->toDateString(),
+        'today_sale' => $todaysale
+    ]);
+});
 
 
 
@@ -135,18 +149,18 @@ Route::middleware(['auth'])->group(function () {
                     ->where('status', '!=', 'Returned')
                     ->sum('total');
 
-                     $thisweeksale = DB::table('invoice_items')
+                $thisweeksale = DB::table('invoice_items')
                     ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
                     ->where('status', '!=', 'Returned')
                     ->sum('total');
-                      $thismonthsale = DB::table('invoice_items')
+                $thismonthsale = DB::table('invoice_items')
                     ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
                     ->where('status', '!=', 'Returned')
                     ->sum('total');
-                     $overallsale = DB::table('invoice_items')
+                $overallsale = DB::table('invoice_items')
                     ->where('status', '!=', 'Returned')
                     ->sum('total');
-                return view('admin', compact('totalrass','yesterdaysale', 'todaysale', 'thisweeksale', 'thismonthsale','overallsale'));
+                return view('admin', compact('totalrass', 'yesterdaysale', 'todaysale', 'thisweeksale', 'thismonthsale', 'overallsale'));
             } else {
                 return abort(401);
             }
