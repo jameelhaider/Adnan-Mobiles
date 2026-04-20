@@ -34,18 +34,21 @@ Route::get('/copy-available-stocks', [StocksController::class, 'copyAvailableSto
 
 
 
-Route::get('/today-sale', function () {
+Route::get('/sales', function () {
     $today = Carbon::today();
-
+    $yesterday = Carbon::yesterday();
     $todaysale = DB::table('invoice_items')
         ->whereDate('created_at', $today)
         ->where('status', '!=', 'Returned')
         ->sum('total');
-
+        $yesterdaysale = DB::table('invoice_items')
+                    ->whereDate('created_at', $yesterday)
+                    ->where('status', '!=', 'Returned')
+                    ->sum('total');
     return response()->json([
         'status' => 'success',
-        'date' => $today->toDateString(),
-        'today_sale' => $todaysale
+        'today_sale' => $todaysale,
+        'yesterday_sale' => $yesterdaysale
     ]);
 });
 
