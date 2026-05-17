@@ -248,6 +248,25 @@
 
 
 
+                     @if (Auth::user()->email !== 'husnainbutt047@gmail.com')
+                  <li
+                        class="menu-header small text-uppercase fw-bold {{ Request::is('admin/tally-stock') ? '' : 'text-dark' }}">
+                        <span class="menu-header-text">Tally Stock</span>
+                    </li>
+                        <li class="menu-item {{ Request::is('admin/tally-stock') ? 'active' : '' }}">
+                            <a href="{{ url('admin/tally-stock') }}"
+                                class="menu-link {{ Request::is('admin/tally-stock*') ? '' : 'text-dark' }} d-flex align-items-center">
+                                <i class="menu-icon tf-icons bx bx-history"></i>
+                                <div data-i18n="Tables">Tally Stock</div>
+                            </a>
+                        </li>
+                    @endif
+
+
+                          <!-- Stocks -->
+
+
+
 
 
 

@@ -112,6 +112,18 @@ Route::middleware(['auth'])->group(function () {
 
 
     Route::group(['prefix' => 'admin'], function () {
+
+        Route::get('/tally-stock', function () {
+     if (Auth::user()->email == 'husnainbutt047@gmail.com') {
+                abort(401);
+            }
+     $stocks = DB::table('stocks')
+        ->where('qty', '>', 0)
+        ->orderBy('name')
+        ->get();
+    return view('tally', compact('stocks'));
+});
+
         Route::get('/change-password', [HomeController::class, 'changepassword'])->name("change.password");
         Route::post('/update-password', [HomeController::class, 'updatepassword'])->name("update.password");
         Route::get('/', function () {
